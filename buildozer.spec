@@ -1,41 +1,18 @@
 [app]
-
-# --- Basic info ---
-title = Mahiru Chat
+title = MahiruChat
 package.name = mahiruchat
-package.domain = org.mahiru
+package.domain = org.test
+source.include_exts = py,png,jpg,kv,atlas
 version = 0.1
-
-# --- Source ---
-source.dir = .
-source.include_exts = py,kv,png,jpg,jpeg,ttf
-
-# --- Assets ---
-icon.filename = %(source.dir)s/icon.png
-presplash.filename = %(source.dir)s/arka_pan.jpg
-
-# --- Requirements ---
-# Pin specific versions for a reproducible build.
-# kivymd must match the kivy version you use.
-requirements = kivy,kivymd,pillow,certifi
-
-# --- Orientation & display ---
-orientation = portrait
-fullscreen = 1
-
-# --- Android SDK/NDK ---
+requirements = python3,kivy,kivymd,pillow,certifi
+android.permissions = INTERNET
+android.archs = arm64-v8a
 android.api = 33
 android.minapi = 21
 android.ndk = 25b
 android.sdk = 33
-android.accept_sdk_license = True
-
-# --- Permissions ---
-android.permissions = INTERNET,READ_EXTERNAL_STORAGE,WRITE_EXTERNAL_STORAGE
-
-# --- Build optimisations ---
-android.release_artifact = apk
+p4a.branch = master
 
 [buildozer]
-log_level = 1
+log_level = 2
 warn_on_root = 1
