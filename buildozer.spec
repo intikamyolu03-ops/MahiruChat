@@ -17,7 +17,7 @@ presplash.filename = %(source.dir)s/arka_pan.jpg
 # --- Requirements ---
 # Pin specific versions for a reproducible build.
 # kivymd must match the kivy version you use.
-requirements = kivy==2.3.0,kivymd==1.2.0,pillow,certifi
+requirements = kivy,kivymd,pillow,certifi
 
 # --- Orientation & display ---
 orientation = portrait
