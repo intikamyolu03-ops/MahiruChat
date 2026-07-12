@@ -1,0 +1,237 @@
+# chat.kv
+<MainScreen>:
+    canvas.before:
+        Rectangle:
+            source: 'arka_plan.jpg'
+            pos: self.pos
+            size: self.size
+
+    # GİRİŞ / KAYIT PANELİ
+    BoxLayout:
+        id: login_panel
+        orientation: 'vertical'
+        padding: 30
+        spacing: 20
+        size_hint: (0.85, 0.6)
+        pos_hint: {"center_x": 0.5, "center_y": 0.5}
+        canvas.before:
+            Color:
+                rgba: 0.95, 0.85, 0.87, 0.95
+            RoundedRectangle:
+                pos: self.pos
+                size: self.size
+                radius: [20,]
+
+        MDLabel:
+            text: "Mahiru Chat'e Hoş Geldin"
+            font_style: "H5"
+            bold: True
+            halign: "center"
+            color: 0.2, 0.2, 0.2, 1
+
+        MDTextField:
+            id: auth_username
+            hint_text: "Kullanıcı Adı"
+            mode: "round"
+
+        MDTextField:
+            id: auth_password
+            hint_text: "Şifre"
+            password: True
+            mode: "round"
+
+        MDLabel:
+            id: auth_status
+            text: ""
+            halign: "center"
+            theme_text_color: "Custom"
+            text_color: 1, 0, 0, 1
+
+        BoxLayout:
+            orientation: 'horizontal'
+            spacing: 15
+            size_hint_y: None
+            height: "45dp"
+
+            MDRaisedButton:
+                text: "Giriş Yap"
+                size_hint_x: 0.5
+                md_bg_color: 0.21, 0.58, 0.95, 1
+                on_press: root.process_auth("LOGIN")
+
+            MDRaisedButton:
+                text: "Kayıt Ol"
+                size_hint_x: 0.5
+                md_bg_color: 0.95, 0.55, 0.58, 1
+                on_press: root.process_auth("REGISTER")
+
+    # ANA UYGULAMA PANELİ (İlk başta gizli, giriş yapılınca açılır)
+    BoxLayout:
+        id: main_panel
+        orientation: 'vertical'
+        opacity: 0
+        disabled: True
+
+        MDTopAppBar:
+            title: "Mahiru Chat"
+            anchor_title: "left"
+            right_action_items: [["bell", lambda x: root.open_notifications()]]
+            elevation: 2
+            md_bg_color: 0.95, 0.75, 0.78, 0.8
+
+        MDBottomNavigation:
+            panel_color: 0.95, 0.85, 0.87, 0.9
+
+            # SEKME 1: SOHBETLER & GRUP KURMA
+            MDBottomNavigationItem:
+                name: 'sohbetler_tab'
+                text: 'Sohbetler'
+                icon: 'chat'
+
+                BoxLayout:
+                    orientation: 'vertical'
+                    padding: 10
+                    spacing: 10
+
+                    BoxLayout:
+                        orientation: 'horizontal'
+                        size_hint_y: None
+                        height: "50dp"
+                        spacing: 10
+                        MDLabel:
+                            text: "Seçilenlerle:"
+                            size_hint_x: 0.3
+                        MDRaisedButton:
+                            text: "👥 Yeni Grup Kur"
+                            md_bg_color: 0.21, 0.58, 0.95, 1
+                            on_press: root.create_group()
+
+                    ScrollView:
+                        MDList:
+                            id: chat_list
+
+            # SEKME 2: ARKADAŞ BUL
+            MDBottomNavigationItem:
+                name: 'arkadas_bul_tab'
+                text: 'Arkadaş Bul'
+                icon: 'account-search'
+
+                BoxLayout:
+                    orientation: 'vertical'
+                    padding: 20
+                    spacing: 15
+
+                    MDTextField:
+                        id: search_username
+                        hint_text: "Kullanıcı adı yazın..."
+                        mode: "round"
+                        icon_right: "magnify"
+
+                    MDRaisedButton:
+                        text: "Ara"
+                        pos_hint: {"center_x": 0.5}
+                        on_press: root.search_user()
+
+                    MDCard:
+                        id: result_card
+                        orientation: "horizontal"
+                        size_hint: (0.9, None)
+                        height: "80dp"
+                        pos_hint: {"center_x": 0.5}
+                        padding: 10
+                        opacity: 0
+                        
+                        MDLabel:
+                            id: result_name
+                            text: "Kullanıcı Adı"
+                            font_style: "H6"
+                        MDRaisedButton:
+                            id: btn_send_request
+                            text: "İstek Yolla"
+                            pos_hint: {"center_y": 0.5}
+                            on_press: root.send_friend_request()
+
+            # SEKME 3: PROFİLİM
+            MDBottomNavigationItem:
+                name: 'profil_tab'
+                text: 'Profilim'
+                icon: 'account'
+                BoxLayout:
+                    orientation: 'vertical'
+                    padding: 20
+                    spacing: 15
+                    
+                    FitImage:
+                        id: profile_avatar
+                        source: 'varsayilan_avatar.png'
+                        size_hint: None, None
+                        size: "120dp", "120dp"
+                        radius: [60,]
+                        pos_hint: {"center_x": 0.5}
+                    
+                    MDRaisedButton:
+                        text: "🖼️ Fotoğraf Seç ve Değiştir"
+                        pos_hint: {"center_x": 0.5}
+                        on_press: root.open_profile_pic_manager()
+
+# DİNAMİK SOHBET SATIRI ŞABLONU (Profil + Yeşil Işık + İsim)
+<CustomChatRow>:
+    size_hint_y: None
+    height: "72dp"
+    padding: 10
+    spacing: 15
+
+    RelativeLayout:
+        size_hint_x: None
+        width: "52dp"
+
+        FitImage:
+            source: root.avatar_source
+            size_hint: None, None
+            size: "48dp", "48dp"
+            radius: [24,]
+            pos_hint: {"center_x": 0.5, "center_y": 0.5}
+
+        Widget:
+            size_hint: None, None
+            size: "14dp", "14dp"
+            pos_hint: {"x": 0.65, "y": 0.1}
+            opacity: 1 if root.is_online else 0
+            canvas:
+                Color:
+                    rgba: 0.1, 0.8, 0.1, 1
+                Ellipse:
+                    pos: self.pos
+                    size: self.size
+
+    BoxLayout:
+        orientation: 'vertical'
+        pos_hint: {"center_y": 0.5}
+        MDLabel:
+            text: root.username
+            font_style: "Subtitle1"
+            bold: True
+        MDLabel:
+            text: root.last_message
+            font_style: "Caption"
+            theme_text_color: "Secondary"
+
+<NotificationDialogContent>:
+    orientation: "vertical"
+    spacing: "12dp"
+    size_hint_y: None
+    height: "120dp"
+    MDLabel:
+        id: req_text
+        text: "Sana arkadaşlık isteği gönderildi!"
+    BoxLayout:
+        orientation: "horizontal"
+        spacing: 10
+        MDRaisedButton:
+            text: "Kabul Et"
+            md_bg_color: 0.2, 0.6, 0.2, 1
+            on_press: root.accept_req()
+        MDFlatButton:
+            text: "Reddet"
+            text_color: 1, 0.2, 0.2, 1
+            on_press: root.reject_req()
